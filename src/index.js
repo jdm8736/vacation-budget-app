@@ -53,21 +53,25 @@ const mockTxnData = [
 { 
     date: '1/1/2018',
     account: 'American_Express',
+    category: 'Christmas',
     amount: '-50.00'
 },
 { 
     date: '1/2/2018',
     account: 'American_Express',
+    category: 'New Years',
     amount: '-500.00'
 },
 { 
     date: '1/3/2018',
     account: 'Capital_One',
+    category: 'Birthday',
     amount: '200.00'
 },
 { 
     date: '1/4/2018',
     account: 'Capital_One',
+    category: 'Stock market',
     amount: '-10.00'
 },
 ]

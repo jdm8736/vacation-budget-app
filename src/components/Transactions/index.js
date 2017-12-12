@@ -7,14 +7,11 @@ import {
     TableRow,
     TableRowColumn
 } from "material-ui/Table";
+import DEFAULTS from "./defaults"
 import TextField from "material-ui/TextField";
 import FlatButton from "material-ui/FlatButton";
 
-const newTransactionDefault =  {
-    date: '1/1/2018',
-    account: '',
-    amount: 0.0
-}
+const newTransactionDefault = DEFAULTS
 
 class Transactions extends Component {
     constructor(props) {
@@ -24,90 +21,73 @@ class Transactions extends Component {
             transactions: props.transactions,
             newTransaction: newTransactionDefault
         }
-    }
-  handleAddRow = () => {
-      this.setState({
-          transactions: [
-              ...this.state.transactions,
-              this.state.newTransaction
-          ],
-          newTransaction: newTransactionDefault
-      })
-  }
 
-  updateNewEntryDate = (e, newVal) => {
-      this.setState({
-        newTransaction: { 
-            ...this.state.newTransaction,
-            date: newVal
-        }
-      })
-  }
-  
-    updateNewEntryAcct = (e, newVal) => {
-        this.setState({
-          newTransaction: { 
-              ...this.state.newTransaction,
-              account: newVal
-          }
+        this.columns = Object.keys(this.state.transactions[0]).map(key => {
+            return {
+                key: key,
+                display: key.toUpperCase(),
+                type: key
+            }
         })
     }
     
-      updateNewEntryAmt= (e, newVal) => {
-          this.setState({
-            newTransaction: { 
-                ...this.state.newTransaction,
-                amount: newVal
-            }
-          })
-      }
+    handleAddRow = () => {
+        this.setState({
+            transactions: [
+                ...this.state.transactions,
+                this.state.newTransaction
+            ],
+            newTransaction: newTransactionDefault
+        })
+    }
 
-  render() {
-    return (
-        <div>
-            <form onSubmit={this.handleAddRow}>
-                <TextField 
-                    hintText="Date"
-                    value={this.state.newTransaction.date}
-                    onChange={this.updateNewEntryDate}
-                />                  
-                <TextField
-                    hintText="Account"
-                    value={this.state.newTransaction.account}
-                    onChange={this.updateNewEntryAcct}
-                />                
-                <TextField
-                    hintText="Amount"
-                    value={this.state.newTransaction.amount}
-                    onChange={this.updateNewEntryAmt}
-                />
-                <FlatButton onClick={this.handleAddRow}>Add</FlatButton>
-                  
-            </form>
-            <Table>
-                <TableHeader displaySelectAll={false}>
-                    <TableRow>
-                        <TableHeaderColumn>Date</TableHeaderColumn>
-                        <TableHeaderColumn>Account</TableHeaderColumn>
-                        <TableHeaderColumn>Amount</TableHeaderColumn>
-                        <TableHeaderColumn></TableHeaderColumn>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {this.state.transactions
-                        .sort((txnA, txnB) => { return txnA.date < txnB.date })
-                        .map((txn) => (
-                        <TableRow>
-                            <TableRowColumn>{txn.date}</TableRowColumn>
-                            <TableRowColumn>{txn.account}</TableRowColumn>
-                            <TableRowColumn>{txn.amount}</TableRowColumn>
-                        </TableRow>
-                    ))}                
-                </TableBody>
-            </Table>
-        </div>
-    );
-  }
+    updateNewEntry = (newVal, which) => {
+        let newState = Object.assign({}, this.state.newTransaction) 
+        newState[which] = newVal
+        this.setState({ newTransaction: newState })
+    }  
+  
+    render() {
+      return (
+          <div>
+              <form onSubmit={this.handleAddRow}>
+                    {this.columns.map(col => (
+                        <TextField 
+                            key={col.key}
+                            hintText={col.display}
+                            value={this.state.newTransaction[col.type]}
+                            onChange={(e, newVal) => {
+                                this.updateNewEntry(newVal, col.type)
+                            }}
+                        />
+                    ))}
+                    <FlatButton onClick={this.handleAddRow}>Add</FlatButton>                    
+              </form>
+              <Table>
+                  <TableHeader displaySelectAll={false}>
+                      <TableRow>                        
+                          {this.columns.map(col => (
+                              <TableHeaderColumn key={col.key}>{col.display}</TableHeaderColumn>
+                          ))}
+                          <TableHeaderColumn></TableHeaderColumn>
+                      </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                      {this.state.transactions
+                          .sort((txnA, txnB) => { return txnA.date < txnB.date })
+                          .map((txn) => (
+                          <TableRow key={txn.date}>
+                              {this.columns.map(col => (
+                                  <TableRowColumn key={col.key}>{txn[col.type]}</TableRowColumn>
+                              ))}
+                              <TableRowColumn></TableRowColumn>
+                          </TableRow>
+                      ))}                
+                  </TableBody>
+              </Table>
+          </div>
+      );
+    }
 }
 
 export default Transactions;
